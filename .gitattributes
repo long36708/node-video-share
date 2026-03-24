@@ -1,0 +1,50 @@
+# Auto detect text files and perform LF normalization
+* text=auto
+
+# Source code files
+*.js text eol=lf
+*.ts text eol=lf
+*.jsx text eol=lf
+*.tsx text eol=lf
+*.json text eol=lf
+*.md text eol=lf
+*.yml text eol=lf
+*.yaml text eol=lf
+
+# Shell scripts
+*.sh text eol=lf
+*.bash text eol=lf
+
+# Config files
+*.gitattributes text eol=lf
+*.gitignore text eol=lf
+
+# Video files (binary)
+*.mp4 binary
+*.webm binary
+*.ogg binary
+*.mov binary
+*.avi binary
+*.mkv binary
+*.flv binary
+*.wmv binary
+
+# Image files (binary)
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.svg text eol=lf
+*.ico binary
+
+# Certificate files (binary)
+*.pem binary
+*.key binary
+*.crt binary
+*.cert binary
+
+# Archives (binary)
+*.zip binary
+*.tar binary
+*.gz binary
+*.7z binary

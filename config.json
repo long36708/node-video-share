@@ -1,0 +1,19 @@
+{
+  "server": {
+    "port": 3000,
+    "https": {
+      "enabled": false,
+      "key": "./key.pem",
+      "cert": "./cert.pem"
+    }
+  },
+  "videos": {
+    "directory": "./videos",
+    "allowedExtensions": [".mp4", ".webm", ".ogg", ".mov", ".avi", ".mkv", ".flv", ".wmv"]
+  },
+  "security": {
+    "enableCorsIsolation": true,
+    "coop": "same-origin",
+    "coep": "require-corp"
+  }
+}
