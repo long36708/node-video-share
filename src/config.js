@@ -1,5 +1,5 @@
 import { readFile } from 'fs/promises';
-import { resolve } from 'path';
+import JSON5 from 'json5';
 
 const DEFAULT_CONFIG = {
   server: {
@@ -24,7 +24,7 @@ const DEFAULT_CONFIG = {
 export async function loadConfig(configPath) {
   try {
     const content = await readFile(configPath, 'utf-8');
-    const userConfig = JSON.parse(content);
+    const userConfig = JSON5.parse(content);
     return mergeConfig(DEFAULT_CONFIG, userConfig);
   } catch (error) {
     if (error.code === 'ENOENT') {

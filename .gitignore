@@ -62,4 +62,4 @@ Thumbs.db
 *.cert
 
 # Config (optional - uncomment if you have local config)
-# config.json
+# config.json5

@@ -10,7 +10,7 @@ const __dirname = resolve(__filename, '..');
 
 async function main() {
   try {
-    const configPath = resolve(__dirname, '../config.json');
+    const configPath = resolve(__dirname, '../config.json5');
     const config = await loadConfig(configPath);
 
     const server = new VideoServer(config);
@@ -22,7 +22,8 @@ async function main() {
     const baseUrl = `${protocol}://localhost:${port}`;
 
     console.log(chalk.green('✓ 服务器已启动:'), chalk.cyan(baseUrl));
-    console.log(chalk.green('✓ 视频目录:'), chalk.cyan(resolve(__dirname, '../', config.videos.directory)));
+    const videoDir = resolve(config.videos.directory);
+    console.log(chalk.green('✓ 视频目录:'), chalk.cyan(videoDir));
 
     if (config.server.https.enabled) {
       console.log(chalk.green('✓ HTTPS已启用'));
@@ -34,7 +35,6 @@ async function main() {
       console.log(chalk.gray('  COEP:'), chalk.cyan(config.security.coep));
     }
 
-    const videoDir = resolve(__dirname, '../', config.videos.directory);
     const videos = await scanVideos(videoDir, baseUrl, config.videos.allowedExtensions);
 
     if (videos.length > 0) {

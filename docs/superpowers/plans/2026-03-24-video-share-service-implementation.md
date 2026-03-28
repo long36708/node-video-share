@@ -159,20 +159,20 @@ const __dirname = dirname(__filename);
 
 describe('Config Manager', () => {
   it('should load config from file', async () => {
-    const config = await loadConfig(join(__dirname, '../config.json'));
+    const config = await loadConfig(join(__dirname, '../config.json5'));
     assert.strictEqual(config.server.port, 3000);
     assert.strictEqual(config.videos.directory, './videos');
   });
 
   it('should provide default values', async () => {
-    const config = await loadConfig(join(__dirname, '../config.json'));
+    const config = await loadConfig(join(__dirname, '../config.json5'));
     assert.strictEqual(config.security.enableCorsIsolation, true);
     assert.strictEqual(config.security.coop, 'same-origin');
     assert.strictEqual(config.security.coep, 'require-corp');
   });
 
   it('should include allowed video extensions', async () => {
-    const config = await loadConfig(join(__dirname, '../config.json'));
+    const config = await loadConfig(join(__dirname, '../config.json5'));
     assert(Array.isArray(config.videos.allowedExtensions));
     assert.ok(config.videos.allowedExtensions.includes('.mp4'));
   });
@@ -1062,7 +1062,7 @@ const __dirname = resolve(__filename, '..');
 async function main() {
   try {
     // Load config
-    const configPath = resolve(__dirname, '../config.json');
+    const configPath = resolve(__dirname, '../config.json5');
     const config = await loadConfig(configPath);
 
     // Create server

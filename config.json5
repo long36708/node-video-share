@@ -8,7 +8,8 @@
     }
   },
   "videos": {
-    "directory": "./videos",
+//    "directory": "./videos",
+    "directory": "D:\\00video-media",
     "allowedExtensions": [".mp4", ".webm", ".ogg", ".mov", ".avi", ".mkv", ".flv", ".wmv"]
   },
   "security": {
