@@ -87,8 +87,13 @@ export class VideoServer {
           let end = matches[2] ? parseInt(matches[2], 10) : fileStats.size - 1;
 
           // 验证 Range 参数
-          if (start >= fileStats.size || end >= fileStats.size || start > end) {
+          if (start >= fileStats.size || start > end) {
             return res.status(416).setHeader('Content-Range', `*/${fileStats.size}`).end();
+          }
+
+          // 将 end 截断到文件实际范围内
+          if (end >= fileStats.size) {
+            end = fileStats.size - 1;
           }
 
           const contentLength = end - start + 1;
