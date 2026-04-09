@@ -8,9 +8,34 @@
     }
   },
   "videos": {
-//    "directory": "./videos",
-    "directory": "D:\\00video-media",
-    "allowedExtensions": [".mp4", ".webm", ".ogg", ".mov", ".avi", ".mkv", ".flv", ".wmv",'.ps']
+    //    "directory": "./videos",
+    "directory": "/Users/longmo/Movies",
+    //    "directory": "D:\\00video-media",
+    "allowedExtensions": [
+      ".mp4",
+      ".webm",
+      ".ogg",
+      ".mov",
+      ".avi",
+      ".mkv",
+      ".flv",
+      ".wmv",
+      '.ps'
+    ],
+    // 远程视频地址列表（支持跨域限制的视频）
+    "remoteVideos": [
+      {
+        "id": "sample1",
+        "name": "赛车手",
+        "url": "https://ff0be01e-hri-aiop-train-develop.oss-cn-hangzhou.aliyuncs.com/video/8ea30f94e89740238a1f9a350abc79e6.mp4"
+      },
+      {
+        "id": "sample2",
+        "name": "加密视频",
+        key: '0709005b07e9aea7',
+        "url": "http://saas-trainningdata-test.oss-cn-hangzhou.aliyuncs.com/video/1739427494754d0bd4208?Expires=4070880001&OSSAccessKeyId=LTAI0nvqaUuErF4G&Signature=rPU8H%2FQppk%2BFil2bkQdhfoQXuSQ%3D"
+      }
+    ]
   },
   "security": {
     "enableCorsIsolation": true,

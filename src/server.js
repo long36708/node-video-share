@@ -8,6 +8,7 @@ import { securityMiddleware } from './middleware/security.js';
 import { corsMiddleware, corsIsolationMiddleware } from './middleware/cors.js';
 import { rangeMiddleware } from './middleware/range.js';
 import { videosRoute } from './routes/videos.js';
+import { proxyRoute } from './routes/proxy.js';
 import { createReadStream } from 'fs';
 
 export class VideoServer {
@@ -55,6 +56,9 @@ export class VideoServer {
     });
 
     this.app.get('/videos.html', videosRoute(this.config));
+
+    // 视频代理路由 - 用于解决跨域问题
+    this.app.get('/proxy/:videoId', proxyRoute(this.config));
 
     this.app.get('/videos/*', async (req, res, next) => {
       try {
