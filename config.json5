@@ -27,12 +27,14 @@
       {
         "id": "sample1",
         "name": "赛车手",
+        "duration": "00:10",
         "url": "https://ff0be01e-hri-aiop-train-develop.oss-cn-hangzhou.aliyuncs.com/video/8ea30f94e89740238a1f9a350abc79e6.mp4"
       },
       {
         "id": "sample2",
         "name": "加密视频",
-        key: '0709005b07e9aea7',
+        "key": '0709005b07e9aea7',
+        "duration": '01:14',
         "url": "http://saas-trainningdata-test.oss-cn-hangzhou.aliyuncs.com/video/1739427494754d0bd4208?Expires=4070880001&OSSAccessKeyId=LTAI0nvqaUuErF4G&Signature=rPU8H%2FQppk%2BFil2bkQdhfoQXuSQ%3D"
       }
     ]

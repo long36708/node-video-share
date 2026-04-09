@@ -22,6 +22,13 @@ export function proxyRoute(config) {
       }
 
       console.log(`Proxying video request: ${videoId} -> ${remoteVideo.url}`);
+      console.log(`Request method: ${req.method}`);
+
+      // 处理 OPTIONS 预检请求
+      if (req.method === 'OPTIONS') {
+        res.status(204).end();
+        return;
+      }
 
       // 转发请求到远程视频地址
       await proxyRequest(remoteVideo.url, req, res);
@@ -47,19 +54,28 @@ function proxyRequest(targetUrl, req, res) {
     const isHttps = url.protocol === 'https:';
     const client = isHttps ? https : http;
 
-    // 构建代理请求的 headers
+    // 对于 HEAD 请求,OSS 签名验证会失败(因为签名是基于 GET 生成的)
+    // 将 HEAD 请求转换为 GET,但在响应时不发送 body
+    const actualMethod = req.method === 'HEAD' ? 'GET' : req.method;
+
+    // 构建代理请求的 headers - 尽量保持原始请求头,只修改必要的
     const headers = {};
     
-    // 复制原始 headers,但排除一些可能导致问题的头
+    // 复制所有原始 headers
     for (const [key, value] of Object.entries(req.headers)) {
-      // 跳过这些头,避免问题
-      if (!['host', 'origin', 'referer', 'connection', 'keep-alive'].includes(key.toLowerCase())) {
+      const lowerKey = key.toLowerCase();
+      // 跳过这些会导致问题的头
+      if (!['host', 'connection', 'keep-alive'].includes(lowerKey)) {
         headers[key] = value;
       }
     }
     
-    // 设置正确的 host
+    // 设置正确的 host(必须与目标服务器匹配)
     headers.host = url.host;
+    
+    // 对于 OSS 等签名验证的服务,不要移除 origin 和 referer
+    // 如果原始请求有这些头,保留它们
+    // 如果没有,也不主动添加
 
     // 处理 Range 请求头
     if (req.headers.range) {
@@ -70,7 +86,7 @@ function proxyRequest(targetUrl, req, res) {
       hostname: url.hostname,
       port: url.port || (isHttps ? 443 : 80),
       path: url.pathname + url.search,
-      method: req.method,
+      method: actualMethod, // 使用转换后的方法
       headers: headers,
       timeout: 30000, // 30秒超时
       rejectUnauthorized: false // 允许自签名证书(用于开发环境)
@@ -78,6 +94,15 @@ function proxyRequest(targetUrl, req, res) {
 
     const proxyReq = client.request(options, (proxyRes) => {
       console.log(`Proxy response status: ${proxyRes.statusCode}`);
+
+      // 对于 HEAD 请求,只发送 headers,不发送 body
+      if (req.method === 'HEAD') {
+        res.writeHead(proxyRes.statusCode, filterResponseHeaders(proxyRes.headers));
+        res.end();
+        console.log('HEAD request completed (body skipped)');
+        resolve();
+        return;
+      }
 
       // 设置响应头
       res.writeHead(proxyRes.statusCode, filterResponseHeaders(proxyRes.headers));
