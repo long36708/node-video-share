@@ -8,7 +8,13 @@ export function videosRoute(config) {
       const baseUrl = `${protocol}://${host}`;
       const videos = await scanVideos(config.videos.directory, baseUrl, config.videos.allowedExtensions);
 
-      const html = generateVideosHtml(baseUrl, videos);
+      // 获取远程视频列表及其代理地址
+      const remoteVideos = (config.videos.remoteVideos || []).map(video => ({
+        ...video,
+        proxyUrl: `${baseUrl}/proxy/${video.id}`
+      }));
+
+      const html = generateVideosHtml(baseUrl, videos, remoteVideos);
       res.send(html);
     } catch (error) {
       res.status(500).json({ error: 'Failed to scan videos' });
@@ -16,7 +22,12 @@ export function videosRoute(config) {
   };
 }
 
-function generateVideosHtml(baseUrl, videos) {
+function generateVideosHtml(baseUrl, videos, remoteVideos = []) {
+  const allVideos = [
+    ...videos.map(v => ({ ...v, type: 'local' })),
+    ...remoteVideos.map(v => ({ ...v, type: 'remote' }))
+  ];
+
   return `<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
@@ -49,6 +60,13 @@ function generateVideosHtml(baseUrl, videos) {
             color: #666;
             margin-bottom: 20px;
         }
+        .section-title {
+            color: #333;
+            margin: 30px 0 15px 0;
+            font-size: 20px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #e0e0e0;
+        }
         .video-list {
             display: grid;
             gap: 15px;
@@ -65,6 +83,12 @@ function generateVideosHtml(baseUrl, videos) {
         }
         .video-item:hover {
             box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+        .video-item.remote {
+            border-left: 4px solid #FF9800;
+        }
+        .video-item.local {
+            border-left: 4px solid #4CAF50;
         }
         .video-info {
             flex: 1;
@@ -85,6 +109,21 @@ function generateVideosHtml(baseUrl, videos) {
             color: #2196F3;
             font-size: 12px;
             word-break: break-all;
+        }
+        .video-type {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            margin-left: 8px;
+        }
+        .video-type.remote {
+            background: #FFF3E0;
+            color: #E65100;
+        }
+        .video-type.local {
+            background: #E8F5E9;
+            color: #2E7D32;
         }
         .video-actions {
             display: flex;
@@ -130,15 +169,43 @@ function generateVideosHtml(baseUrl, videos) {
         <strong>服务器:</strong> ${baseUrl}
     </div>
     <div class="stats">
-        共找到 <strong>${videos.length}</strong> 个视频文件
+        本地视频: <strong>${videos.length}</strong> 个 | 
+        远程视频: <strong>${remoteVideos.length}</strong> 个 | 
+        总计: <strong>${allVideos.length}</strong> 个
     </div>
+
+    ${remoteVideos.length > 0 ? `
+    <h2 class="section-title">🌐 远程视频（通过代理访问，无跨域限制）</h2>
     <div class="video-list">
-        ${videos.length === 0 ? '<div class="empty-state">没有找到视频文件</div>' : ''}
-        ${videos.map(video => `
-            <div class="video-item">
+        ${remoteVideos.map(video => `
+            <div class="video-item remote">
                 <div class="video-info">
                     <div class="video-name">
                         <span class="icon">🎬</span>${video.name}
+                        <span class="video-type remote">远程</span>
+                    </div>
+                    <div class="video-path">原始地址: ${video.url}</div>
+                    <div class="video-link">代理地址: ${video.proxyUrl}</div>
+                </div>
+                <div class="video-actions">
+                    <button class="btn btn-copy" onclick="copyLink('${video.proxyUrl}', this)">复制代理地址</button>
+                    <button class="btn btn-play" onclick="playVideo('${video.proxyUrl}')">播放视频</button>
+                </div>
+            </div>
+        `).join('')}
+    </div>
+    ` : ''}
+
+    <h2 class="section-title">💻 本地视频</h2>
+    <div class="video-list">
+        ${videos.length === 0 && remoteVideos.length === 0 ? '<div class="empty-state">没有找到视频文件</div>' : ''}
+        ${videos.length === 0 && remoteVideos.length > 0 ? '<div class="empty-state">暂无本地视频</div>' : ''}
+        ${videos.map(video => `
+            <div class="video-item local">
+                <div class="video-info">
+                    <div class="video-name">
+                        <span class="icon">🎬</span>${video.name}
+                        <span class="video-type local">本地</span>
                     </div>
                     <div class="video-path">📁 ${video.relativePath}</div>
                     <div class="video-link">${video.url}</div>
