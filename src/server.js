@@ -1,6 +1,7 @@
 import express from 'express';
 import https from 'https';
 import http from 'http';
+import { WebSocketServer } from 'ws';
 import { readFile, stat } from 'fs/promises';
 import { existsSync } from 'fs';
 import { lookup } from 'mime-types';
@@ -8,7 +9,9 @@ import { securityMiddleware } from './middleware/security.js';
 import { corsMiddleware, corsIsolationMiddleware } from './middleware/cors.js';
 import { rangeMiddleware } from './middleware/range.js';
 import { videosRoute } from './routes/videos.js';
+import { wsVideosRoute } from './routes/ws-videos.js';
 import { proxyRoute } from './routes/proxy.js';
+import { setupWebSocketVideoHandler } from './routes/websocket.js';
 import { createReadStream } from 'fs';
 
 export class VideoServer {
@@ -16,6 +19,7 @@ export class VideoServer {
     this.config = config;
     this.app = express();
     this.server = null;
+    this.wss = null;
     this.setupMiddleware();
     this.setupRoutes();
   }
@@ -31,7 +35,7 @@ export class VideoServer {
     this.app.use(corsMiddleware({
       origin: '*',
       methods: 'GET, HEAD, OPTIONS',
-      allowedHeaders: 'Content-Type, Range'
+      allowedHeaders: 'Content-Type, Range, LSize'
     }));
 
     // 跨域隔离中间件 - 仅在 HTTPS 下生效
@@ -56,6 +60,7 @@ export class VideoServer {
     });
 
     this.app.get('/videos.html', videosRoute(this.config));
+    this.app.get('/ws-videos.html', wsVideosRoute(this.config));
 
     // 视频代理路由 - 用于解决跨域问题
     this.app.get('/proxy/:videoId', proxyRoute(this.config));
@@ -166,6 +171,12 @@ export class VideoServer {
         reject(err);
       } else {
         console.log(`Server listening on port ${port}`);
+        
+        // 初始化WebSocket服务器
+        this.wss = new WebSocketServer({ server: this.server });
+        setupWebSocketVideoHandler(this.wss, this.config);
+        console.log('WebSocket server initialized');
+        
         resolve();
       }
     });
@@ -173,6 +184,12 @@ export class VideoServer {
 
   stop() {
     return new Promise((resolve) => {
+      if (this.wss) {
+        this.wss.close(() => {
+          console.log('WebSocket server stopped');
+        });
+      }
+      
       if (this.server) {
         this.server.close(() => {
           console.log('Server stopped');

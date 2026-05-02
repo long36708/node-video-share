@@ -6,7 +6,8 @@
   "type": "module",
   "scripts": {
     "start": "node src/index.js",
-    "test": "node --test"
+    "test": "node --test",
+    "ws-client": "node test-ws-client.js"
   },
   "keywords": [
     "video",
@@ -20,6 +21,7 @@
     "chalk": "^5.3.0",
     "express": "^4.18.2",
     "json5": "^2.2.3",
-    "mime-types": "^2.1.35"
+    "mime-types": "^2.1.35",
+    "ws": "^8.20.0"
   }
 }

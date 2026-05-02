@@ -8,7 +8,6 @@ export function videosRoute(config) {
       const baseUrl = `${protocol}://${host}`;
       const videos = await scanVideos(config.videos.directory, baseUrl, config.videos.allowedExtensions);
 
-      // 获取远程视频列表及其代理地址
       const remoteVideos = (config.videos.remoteVideos || []).map(video => ({
         ...video,
         proxyUrl: `${baseUrl}/proxy/${video.id}`
@@ -161,9 +160,19 @@ function generateVideosHtml(baseUrl, videos, remoteVideos = []) {
             font-size: 24px;
             margin-right: 10px;
         }
+        .nav-link {
+            display: inline-block;
+            margin-bottom: 20px;
+            color: #1976D2;
+            text-decoration: none;
+        }
+        .nav-link:hover {
+            text-decoration: underline;
+        }
     </style>
 </head>
 <body>
+    <a class="nav-link" href="/ws-videos.html">🔌 查看WebSocket视频列表 →</a>
     <h1>📺 视频文件列表</h1>
     <div class="server-info">
         <strong>服务器:</strong> ${baseUrl}
@@ -219,18 +228,45 @@ function generateVideosHtml(baseUrl, videos, remoteVideos = []) {
     </div>
     <script>
         function copyLink(url, button) {
-            navigator.clipboard.writeText(url).then(() => {
-                const btn = button;
-                const originalText = btn.textContent;
-                btn.textContent = '已复制!';
-                btn.style.background = '#45a049';
-                setTimeout(() => {
-                    btn.textContent = originalText;
-                    btn.style.background = '#4CAF50';
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(url).then(function() {
+                    var originalText = button.textContent;
+                    button.textContent = '已复制!';
+                    button.style.background = '#45a049';
+                    setTimeout(function() {
+                        button.textContent = originalText;
+                        button.style.background = '#4CAF50';
+                    }, 2000);
+                }).catch(function() {
+                    fallbackCopy(url, button);
+                });
+            } else {
+                fallbackCopy(url, button);
+            }
+        }
+
+        function fallbackCopy(url, button) {
+            var textArea = document.createElement('textarea');
+            textArea.value = url;
+            textArea.style.position = 'fixed';
+            textArea.style.left = '-999999px';
+            textArea.style.opacity = '0';
+            document.body.appendChild(textArea);
+            textArea.focus();
+            textArea.select();
+            try {
+                document.execCommand('copy');
+                var originalText = button.textContent;
+                button.textContent = '已复制!';
+                button.style.background = '#45a049';
+                setTimeout(function() {
+                    button.textContent = originalText;
+                    button.style.background = '#4CAF50';
                 }, 2000);
-            }).catch(err => {
+            } catch (err) {
                 alert('复制失败: ' + err);
-            });
+            }
+            document.body.removeChild(textArea);
         }
 
         function playVideo(url) {

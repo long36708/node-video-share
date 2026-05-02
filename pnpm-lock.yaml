@@ -20,6 +20,9 @@ importers:
       mime-types:
         specifier: ^2.1.35
         version: 2.1.35
+      ws:
+        specifier: ^8.20.0
+        version: 8.20.0
 
 packages:
 
@@ -295,6 +298,18 @@ packages:
   vary@1.1.2:
     resolution: {integrity: sha512-BNGbWLfd0eUPabhkXUVm0j8uuvREyTh5ovRa/dyow/BqAbZJyC+5fU+IzQOzmAKzYqYRAISoRhdQr3eIZ/PXqg==}
     engines: {node: '>= 0.8'}
+
+  ws@8.20.0:
+    resolution: {integrity: sha512-sAt8BhgNbzCtgGbt2OxmpuryO63ZoDk/sqaB/znQm94T4fCEsy/yV+7CdC1kJhOU9lboAEU7R3kquuycDoibVA==}
+    engines: {node: '>=10.0.0'}
+    peerDependencies:
+      bufferutil: ^4.0.1
+      utf-8-validate: '>=5.0.2'
+    peerDependenciesMeta:
+      bufferutil:
+        optional: true
+      utf-8-validate:
+        optional: true
 
 snapshots:
 
@@ -599,3 +614,5 @@ snapshots:
   utils-merge@1.0.1: {}
 
   vary@1.1.2: {}
+
+  ws@8.20.0: {}
