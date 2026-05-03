@@ -4,6 +4,7 @@ import chalk from 'chalk';
 import { loadConfig } from './config.js';
 import { VideoServer } from './server.js';
 import { scanVideos } from './utils/videoScanner.js';
+import { scanImages } from './utils/imageScanner.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = resolve(__filename, '..');
@@ -77,6 +78,28 @@ async function main() {
     console.log('');
     console.log(chalk.yellow('访问HTTP视频列表页面:'), chalk.cyan(`${baseUrl}/videos.html`));
     console.log(chalk.yellow('访问WebSocket视频列表页面:'), chalk.cyan(`${baseUrl}/ws-videos.html`));
+    console.log('');
+
+    // 扫描图片
+    const imageDir = resolve(config.images.directory);
+    const images = await scanImages(imageDir, baseUrl, config.images.allowedExtensions);
+
+    if (images.length > 0) {
+      console.log(chalk.green(`✓ 发现 ${images.length} 个图片`));
+      console.log('');
+      console.log(chalk.yellow('🖼️ 图片链接示例:'));
+      images.slice(0, 3).forEach((image, index) => {
+        console.log(chalk.white(`${index + 1}. ${image.relativePath}`));
+        console.log(chalk.cyan(`   ${image.url}`));
+        console.log('');
+      });
+    } else {
+      console.log(chalk.yellow('⚠ 未找到图片文件'));
+      console.log(chalk.gray(`  请将图片文件放置在: ${imageDir}`));
+    }
+
+    console.log('');
+    console.log(chalk.yellow('访问图片列表页面:'), chalk.cyan(`${baseUrl}/images.html`));
     console.log('');
 
     process.on('SIGTERM', async () => {
