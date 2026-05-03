@@ -41,7 +41,7 @@
 		]
 	},
 	"images": {
-		"directory": "./images",
+		"directory": "C:\\Users\\Administrator\\Pictures\\柯南",
 		"allowedExtensions": [".jpg", ".jpeg", ".png", ".gif", ".webp", ".svg"]
 	},
 	"security": {
