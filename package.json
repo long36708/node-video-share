@@ -5,7 +5,7 @@
   "main": "src/index.js",
   "type": "module",
   "scripts": {
-    "start": "portless  node-video-share node src/index.js",
+    "start": "portless node src/index.js",
     "test": "node --test",
     "ws-client": "node test-ws-client.js"
   },
