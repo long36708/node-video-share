@@ -153,6 +153,10 @@ export class VideoServer {
         // 设置强缓存（30天）
         res.setHeader('Cache-Control', 'public, max-age=2592000');
         res.setHeader('Content-Length', fileStats.size);
+        
+        // 添加 CORS 头以支持跨域隔离
+        res.setHeader('Access-Control-Allow-Origin', '*');
+        res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin');
 
         const stream = createReadStream(filePath);
         stream.pipe(res);
