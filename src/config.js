@@ -14,6 +14,10 @@ const DEFAULT_CONFIG = {
     directory: './videos',
     allowedExtensions: ['.mp4', '.webm', '.ogg', '.mov', '.avi', '.mkv', '.flv', '.wmv']
   },
+  images: {
+    directory: './images',
+    allowedExtensions: ['.jpg', '.jpeg', '.png', '.gif', '.webp', '.svg']
+  },
   security: {
     enableCorsIsolation: true,
     coop: 'same-origin',
@@ -39,6 +43,7 @@ function mergeConfig(defaults, userConfig) {
   return {
     server: { ...defaults.server, ...userConfig.server },
     videos: { ...defaults.videos, ...userConfig.videos },
+    images: { ...defaults.images, ...userConfig.images },
     security: { ...defaults.security, ...userConfig.security }
   };
 }

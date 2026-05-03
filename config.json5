@@ -40,6 +40,10 @@
 			}
 		]
 	},
+	"images": {
+		"directory": "./images",
+		"allowedExtensions": [".jpg", ".jpeg", ".png", ".gif", ".webp", ".svg"]
+	},
 	"security": {
 		"enableCorsIsolation": true,
 		"coop": "same-origin",
