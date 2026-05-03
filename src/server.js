@@ -12,6 +12,7 @@ import { videosRoute } from './routes/videos.js';
 import { wsVideosRoute } from './routes/ws-videos.js';
 import { proxyRoute } from './routes/proxy.js';
 import { setupWebSocketVideoHandler } from './routes/websocket.js';
+import { imagesRoute } from './routes/images.js';
 import { createReadStream } from 'fs';
 
 export class VideoServer {
@@ -48,6 +49,9 @@ export class VideoServer {
     this.app.use('/videos', securityMiddleware(this.config.videos.directory));
 
     this.app.use('/videos', rangeMiddleware());
+
+    // 添加图片安全中间件
+    this.app.use('/images', securityMiddleware(this.config.images.directory));
   }
 
   setupRoutes() {
@@ -61,6 +65,7 @@ export class VideoServer {
 
     this.app.get('/videos.html', videosRoute(this.config));
     this.app.get('/ws-videos.html', wsVideosRoute(this.config));
+    this.app.get('/images.html', imagesRoute(this.config));
 
     // 视频代理路由 - 用于解决跨域问题
     this.app.get('/proxy/:videoId', proxyRoute(this.config));
@@ -124,6 +129,35 @@ export class VideoServer {
       } catch (error) {
         console.error('Error serving video:', error);
         console.error('Error stack:', error.stack);
+        res.status(500).json({ error: 'Internal server error', message: error.message });
+      }
+    });
+
+    // 图片文件服务路由
+    this.app.get('/images/*', async (req, res) => {
+      try {
+        const filePath = req.filePath;
+
+        console.log(`Serving image: ${filePath}`);
+
+        if (!existsSync(filePath)) {
+          console.error(`Image not found: ${filePath}`);
+          return res.status(404).json({ error: 'Image not found', path: filePath });
+        }
+
+        const fileStats = await stat(filePath);
+
+        const contentType = lookup(filePath) || 'application/octet-stream';
+        res.setHeader('Content-Type', contentType);
+        
+        // 设置强缓存（30天）
+        res.setHeader('Cache-Control', 'public, max-age=2592000');
+        res.setHeader('Content-Length', fileStats.size);
+
+        const stream = createReadStream(filePath);
+        stream.pipe(res);
+      } catch (error) {
+        console.error('Error serving image:', error);
         res.status(500).json({ error: 'Internal server error', message: error.message });
       }
     });
